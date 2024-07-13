@@ -9,7 +9,10 @@
     <div class="card">
         <div class="search">
             <input type="text" placeholder="Enter city name" spellcheck="false">
-            <button > <img src="Images/search.png"></button>
+            <button> <img src="Images/search.png"></button>
+        </div>
+        <div class="error">
+            <p>Invalid city name</p>
         </div>
         <div class="weather">
             <img src="Images/rain.png" class="weather-icon">
@@ -36,17 +39,40 @@
 
     <script>
         const apiKey = "5ce49a7a5468a03e9cde26f7162d604d";
-        const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=Belgrade";
-        async function checkWeather() {
-            const response = await fetch(apiUrl + `&appid=${apiKey}`);
-            var data = await response.json();
+        const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
 
-            document.querySelector(".city").innerHTML = data.name;
-            document.querySelector(".temp").innerHTML = Math.round(data.main.temp)+"°C";
-            document.querySelector(".humidity").innerHTML = data.main.humidity+"%";
-            document.querySelector(".wind").innerHTML = data.wind.speed+" km/h";
+        const searchBox = document.querySelector(".search input");
+        const searchBTN = document.querySelector(".search button");
+        const weatherIcon = document.querySelector(".weather-icon");
+
+        async function checkWeather(city) {
+            const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
+
+            if(response.status == 404){
+                document.querySelector(".weather").style.display = "none";
+                document.querySelector(".error").style.display = "block";
+            }
+            else{
+
+                var data = await response.json();
+                document.querySelector(".city").innerHTML = data.name;
+                document.querySelector(".temp").innerHTML = Math.round(data.main.temp)+"°C";
+                document.querySelector(".humidity").innerHTML = data.main.humidity+"%";
+                document.querySelector(".wind").innerHTML = data.wind.speed+" km/h";
+
+                weatherIcon.src = `Images/${data.weather[0].main}.png`;
+                
+                document.querySelector(".error").style.display = "none";
+                document.querySelector(".weather").style.display = "block";
+            }
+
         }
-        checkWeather();
+
+        searchBTN.addEventListener("click", ()=>{
+            checkWeather(searchBox.value);
+        })
+
+
     </script>
 
 </body>
